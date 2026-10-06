@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.env
+data/raw/
+data/snapshots/
+data/processed/
+models/*.pkl
+models/*.pt
+runs/
+.DS_Store
