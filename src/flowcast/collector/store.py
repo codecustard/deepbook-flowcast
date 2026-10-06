@@ -21,7 +21,7 @@ from flowcast.config import RAW
 
 STREAMS: dict[str, list[str]] = {
     "orders": ["order_id", "status", "timestamp"],  # /order_updates: Placed, Canceled, Modified, Expired
-    "trades": ["trade_id"],                         # /trades
+    "trades": ["event_digest"],  # /trades; trade_id repeats across fills of one taker order
 }
 
 NUMERIC = {
