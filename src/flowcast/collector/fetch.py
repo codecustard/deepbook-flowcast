@@ -19,12 +19,14 @@ FetchFn = Callable[[str, int, int, int], list[dict]]
 
 def fetch_window(fn: FetchFn, pool: str, start: int, end: int, limit: int = LIMIT) -> tuple[list[dict], bool]:
     """All rows in [start, end) seconds. Returns (rows, truncated)."""
+    lo, hi = start * 1000, end * 1000  # the indexer also returns rows stamped exactly at `end`
     rows: list[dict] = []
     truncated = False
     while end > start:
         page = fn(pool, start, end, limit)
         if len(page) < limit:
-            return rows + page, truncated
+            rows += page
+            break
         oldest = min(r["timestamp"] for r in page) // 1000  # ms -> s
         complete = [r for r in page if r["timestamp"] // 1000 > oldest]
         if complete:
@@ -34,4 +36,4 @@ def fetch_window(fn: FetchFn, pool: str, start: int, end: int, limit: int = LIMI
             rows += page
             truncated = True
             end = oldest
-    return rows, truncated
+    return [r for r in rows if lo <= r["timestamp"] < hi], truncated
