@@ -20,7 +20,9 @@ import pandas as pd
 from flowcast.config import RAW
 
 STREAMS: dict[str, list[str]] = {
-    "orders": ["order_id", "status", "timestamp"],  # /order_updates: Placed, Canceled, Modified, Expired
+    # /order_updates: Placed, Canceled, Modified, Expired. Whole-row key: one order can be
+    # Modified several times in the same millisecond, differing only in quantities.
+    "orders": [],
     "trades": ["event_digest"],  # /trades; trade_id repeats across fills of one taker order
 }
 
@@ -54,8 +56,7 @@ def normalize(rows: list[dict], pool: str, stream: str) -> pd.DataFrame:
             df[c] = df[c].astype("string")
     df["pool"] = pool
     keys = [k for k in STREAMS[stream] if k in df.columns]
-    if keys:
-        df = df.drop_duplicates(subset=keys)
+    df = df.drop_duplicates(subset=keys or None)
     return df.sort_values("timestamp", kind="stable").reset_index(drop=True)
 
 

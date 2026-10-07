@@ -1,8 +1,11 @@
 """Complete fetching under the indexer's 10,000-row cap.
 
-Ask for the whole window; if the answer comes back full, split the window in half and
-ask again, recursively. Busy stretches get small windows, quiet ones stay large, and
-nothing is silently cut off. A 1-second window that is still full is flagged truncated.
+The indexer returns the NEWEST rows in a window, capped at the limit. When a page comes
+back full, keep every second it covers completely and ask again for the older remainder,
+up to and including the page's oldest (possibly partial) second. Every row is fetched
+about once, so a busy hour costs ~rows/limit requests. A single second with more rows
+than the cap can't be split further: its newest `limit` rows are kept and the window is
+flagged truncated.
 """
 
 from __future__ import annotations
@@ -16,12 +19,19 @@ FetchFn = Callable[[str, int, int, int], list[dict]]
 
 def fetch_window(fn: FetchFn, pool: str, start: int, end: int, limit: int = LIMIT) -> tuple[list[dict], bool]:
     """All rows in [start, end) seconds. Returns (rows, truncated)."""
-    rows = fn(pool, start, end, limit)
-    if len(rows) < limit:
-        return rows, False
-    if end - start <= 1:
-        return rows, True
-    mid = (start + end) // 2
-    left, t1 = fetch_window(fn, pool, start, mid, limit)
-    right, t2 = fetch_window(fn, pool, mid, end, limit)
-    return left + right, t1 or t2
+    rows: list[dict] = []
+    truncated = False
+    while end > start:
+        page = fn(pool, start, end, limit)
+        if len(page) < limit:
+            return rows + page, truncated
+        oldest = min(r["timestamp"] for r in page) // 1000  # ms -> s
+        complete = [r for r in page if r["timestamp"] // 1000 > oldest]
+        if complete:
+            rows += complete
+            end = oldest + 1  # re-fetch the oldest second whole
+        else:  # the whole page is one second over the cap
+            rows += page
+            truncated = True
+            end = oldest
+    return rows, truncated
