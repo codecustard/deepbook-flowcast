@@ -83,6 +83,24 @@ def book(pool: str = "SUI_USDC", start: str = "2025-08-01", end: str = "2025-11-
 
 
 @app.command()
+def labels(pools: str = "SUI_USDC,DEEP_USDC"):
+    """Up/flat/down labels at 1s/10s/60s from rebuilt books (thresholds fit on Aug 2025)."""
+    from flowcast.labels import make_labels
+
+    for p in pools.split(","):
+        make_labels(p)
+
+
+@app.command()
+def baselines(pools: str = "SUI_USDC,DEEP_USDC"):
+    """Score flat / imbalance / Binance lead-lag rules: fit on Aug 2025, scored on Sep 2025."""
+    from flowcast.models import rules
+
+    for p in pools.split(","):
+        rules.run(p)
+
+
+@app.command()
 def features(pool: str = "SUI_USDC"):
     """Build features from rebuilt books (week 3)."""
     from flowcast import features as f
