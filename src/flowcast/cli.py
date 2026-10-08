@@ -101,11 +101,13 @@ def baselines(pools: str = "SUI_USDC,DEEP_USDC"):
 
 
 @app.command()
-def features(pool: str = "SUI_USDC"):
-    """Build features from rebuilt books (week 3)."""
+def features(pools: str = "SUI_USDC,DEEP_USDC",
+             redo: bool = typer.Option(False, help="rebuild days already on disk")):
+    """Per-second features (X) from rebuilt books, raw events and Binance -> data/processed/features/."""
     from flowcast import features as f
 
-    f.build(pool)
+    for p in pools.split(","):
+        f.build(p, redo=redo)
 
 
 if __name__ == "__main__":
