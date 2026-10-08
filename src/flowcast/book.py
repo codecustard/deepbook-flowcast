@@ -208,5 +208,5 @@ def rebuild(pool: str, start: str, end: str, depth: int = DEPTH) -> list[dict]:
         report.append(r)
         print(f"[book] {pool} {r['date']}  fills={r['fills']:6}  trade_throughs={r['trade_throughs']}  "
               f"unknown={r['fills_unknown']:.4f}  cancels_match={r['cancels_match']:.4f}  "
-              f"crossed_s={r['crossed_s']:.4f}  spread={r['median_spread']:.5f}")
+              f"crossed_s={r['crossed_s']:.4f}  spread={r['median_spread']:.5f}", flush=True)
     return report

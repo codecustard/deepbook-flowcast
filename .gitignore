@@ -13,3 +13,4 @@ models/*.pkl
 models/*.pt
 runs/
 .DS_Store
+*.log
