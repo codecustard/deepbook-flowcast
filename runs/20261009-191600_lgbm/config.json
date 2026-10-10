@@ -1,0 +1,48 @@
+{
+  "kind": "lgbm",
+  "grid": {
+    "model__n_estimators": [
+      150,
+      400
+    ],
+    "model__num_leaves": [
+      15,
+      63
+    ],
+    "model__class_weight": [
+      "balanced",
+      null
+    ]
+  },
+  "pools": [
+    "SUI_USDC",
+    "DEEP_USDC"
+  ],
+  "horizons": [
+    "1s",
+    "10s",
+    "60s"
+  ],
+  "feature_sets": [
+    "deepbook",
+    "all"
+  ],
+  "train": [
+    "2025-08-02",
+    "2025-09-01"
+  ],
+  "valid": [
+    "2025-09-01",
+    "2025-10-01"
+  ],
+  "cv": "TimeSeriesSplit(3)",
+  "train_step": {
+    "1s": 5,
+    "10s": 10,
+    "60s": 60
+  },
+  "git": {
+    "commit": "a36386add7de36c110d15c000eb275221ba27bf1",
+    "uncommitted_changes": false
+  }
+}

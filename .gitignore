@@ -11,6 +11,6 @@ data/snapshots/
 data/processed/
 models/*.pkl
 models/*.pt
-runs/
+runs/*/models/
 .DS_Store
 *.log

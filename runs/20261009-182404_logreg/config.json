@@ -1,0 +1,47 @@
+{
+  "kind": "logreg",
+  "grid": {
+    "model__C": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "model__class_weight": [
+      "balanced",
+      null
+    ]
+  },
+  "pools": [
+    "SUI_USDC",
+    "DEEP_USDC"
+  ],
+  "horizons": [
+    "1s",
+    "10s",
+    "60s"
+  ],
+  "feature_sets": [
+    "deepbook",
+    "all"
+  ],
+  "train": [
+    "2025-08-02",
+    "2025-09-01"
+  ],
+  "valid": [
+    "2025-09-01",
+    "2025-10-01"
+  ],
+  "cv": "TimeSeriesSplit(3)",
+  "train_step": {
+    "1s": 5,
+    "10s": 10,
+    "60s": 60
+  },
+  "git": {
+    "commit": "d52a73a (approx.)",
+    "uncommitted_changes": true,
+    "note": "same model code as d52a73a; carry-over row settings corrected in results.csv afterwards"
+  }
+}

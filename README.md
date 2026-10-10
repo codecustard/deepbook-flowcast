@@ -6,7 +6,9 @@ DeepBook publishes every order placed, modified, cancelled and filled, with trad
 
 ## Status
 
-Week 1: DeepBook collector and Binance downloader working. Book reconstruction, features, and models are stubs. See [ROADMAP.md](ROADMAP.md).
+Data, order book, labels, features, baselines, logistic regression and LightGBM are done, with day-level bootstrap
+intervals on September 2025 (validation). Next: walk-forward, then the one-time October test. Step-by-step history in
+[docs/LOG.md](docs/LOG.md); plan in [ROADMAP.md](ROADMAP.md); results in `notebooks/00`–`04`.
 
 ## Quickstart
 

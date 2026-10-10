@@ -1,0 +1,28 @@
+{
+  "kind": "logreg",
+  "grid": {
+    "model__C": [
+      0.01,
+      0.1,
+      1.0
+    ]
+  },
+  "fixed": {
+    "class_weight": "balanced"
+  },
+  "train": [
+    "2025-08-02",
+    "2025-09-01"
+  ],
+  "valid": [
+    "2025-09-01",
+    "2025-10-01"
+  ],
+  "cv": "TimeSeriesSplit(3)",
+  "note": "first run; C=0.01 won everywhere (edge of grid)",
+  "git": {
+    "commit": "d52a73a (approx.)",
+    "uncommitted_changes": true,
+    "note": "ran before run folders/git recording; grid C=[0.01,0.1,1], class_weight fixed balanced"
+  }
+}

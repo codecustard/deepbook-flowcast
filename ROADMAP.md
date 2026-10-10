@@ -29,7 +29,7 @@ Full plan: "DeepBook Order-Flow Study: Project Plan" (Claude doc). Summary below
 - [x] **Week of Sep 28 (slipped into Oct 5):** collector + raw store; Binance downloader; pull Aug–Oct 2025 and Jul–Sep 2026 (DeepBook + Binance). Live snapshot recorder deferred: the book is validated against trades instead; start it before the live predictor
 - [x] **Week of Oct 5:** book reconstruction + validation; labels; baselines (always-flat, imbalance rule, Binance lead-lag rule)
 - [ ] **Week of Oct 12:** ~~features incl. Binance cross-venue~~ ✓; ~~logistic regression + gradient boosting, with and without Binance~~ ✓; ~~bootstrap intervals~~ ✓; ~~lead-lag cross-correlation~~ ✓; walk-forward eval
-- [ ] **Week of Oct 19:** CNN/LSTM; slices by horizon, pool, regime, bot state; SHAP (started in notebooks/02_models.ipynb)
+- [ ] **Week of Oct 19:** CNN/LSTM; slices by horizon, pool, regime, bot state; SHAP (started in notebooks/03_models.ipynb)
 - [ ] **Week of Oct 26:** live predictor, dashboard (model vs rule scoreboard), API, Docker; README write-up
 
 ## Cut order if behind

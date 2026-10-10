@@ -7,6 +7,7 @@ DEEP_USDC is the thin, test-only pool: the SUI_USDC-trained model is scored on i
 Every run gets its own folder, so nothing is overwritten:
   runs/{YYYYmmdd-HHMMSS}_{kind}/results.csv    the results table (saved after each model)
   runs/{YYYYmmdd-HHMMSS}_{kind}/config.json    grid, dates, cv, git commit: what was tried
+  runs/{YYYYmmdd-HHMMSS}_{kind}/cv_results.csv every setting tried and its score on each Aug fold
   runs/{YYYYmmdd-HHMMSS}_{kind}/models/{kind}_{pool}_{horizon}_{features}.joblib
 """
 
@@ -75,7 +76,7 @@ def run(kind: str = "logreg", pools=("SUI_USDC", "DEEP_USDC"), horizons=HORIZONS
     print(f"[train] run folder: {out_dir}")
     path = lambda p, h, fs: out_dir / "models" / f"{kind}_{p}_{h}_{fs}.joblib"  # noqa: E731
 
-    rows = []
+    rows, cv_rows = [], []
     bar = tqdm(total=len(pools) * len(horizons) * len(feature_sets), desc="train", unit="model")
     for pool in pools:
         tqdm.write(f"[train] {pool}: loading Aug + Sep, scoring baselines...")
@@ -92,6 +93,11 @@ def run(kind: str = "logreg", pools=("SUI_USDC", "DEEP_USDC"), horizons=HORIZONS
                 search = GridSearchCV(make_pipeline(kind, list(X.columns)), GRIDS[kind], scoring=SCORER,
                                       cv=TimeSeriesSplit(CV_FOLDS), n_jobs=-1, verbose=2).fit(X, y)
                 model = search.best_estimator_
+                cv = pd.DataFrame(search.cv_results_)
+                keep = [c for c in cv.columns if c.startswith(("param_", "split")) or c in
+                        ("mean_test_score", "std_test_score", "rank_test_score", "mean_fit_time")]
+                cv_rows.append(cv[keep].assign(pool=pool, horizon=h, features=fs))
+                pd.concat(cv_rows).to_csv(out_dir / "cv_results.csv", index=False)
                 joblib.dump(model, path(pool, h, fs))
                 r = {"model": kind, "pool": pool, "horizon": h, "features": fs, "trained_on": pool,
                      **{k.split("__")[-1]: v for k, v in search.best_params_.items()},
