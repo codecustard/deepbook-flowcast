@@ -69,22 +69,37 @@ def signals(pool: str, start: str, end: str) -> pd.DataFrame:
     return df
 
 
-def run(pool: str) -> pd.DataFrame:
-    train, valid = signals(pool, *TRAIN), signals(pool, *VALID)
-    rows = []
+def fit(pool: str, train: pd.DataFrame | None = None) -> dict[tuple[int, str], tuple[str, float]]:
+    """Tune each rule on the train month: {(horizon_s, rule): (signal column, threshold a)}."""
+    train = signals(pool, *TRAIN) if train is None else train
+    out = {}
     for h in HORIZONS:
-        y = f"label_{h}s"
-        tr, va = train.dropna(subset=[y]), valid.dropna(subset=[y])
-        ytr, yva = tr[y].to_numpy(int), va[y].to_numpy(int)
-        rows.append({"horizon": f"{h}s", "rule": "flat", "signal": "", "a": None,
-                     "macro_f1": macro_f1(yva, np.zeros_like(yva)), "accuracy": (yva == 0).mean()})
+        tr = train.dropna(subset=[f"label_{h}s"])
+        ytr = tr[f"label_{h}s"].to_numpy(int)
         for rule, grid in GRIDS.items():
             cols = [f"imbalance_{k}" for k in LEVELS] if rule == "imbalance" else [rule]
             x = {c: np.nan_to_num(tr[c].to_numpy()) for c in cols}
-            col, a = max(((c, g) for c in cols for g in grid),
-                         key=lambda cg: macro_f1(ytr, by_threshold(x[cg[0]], cg[1])))
-            p = by_threshold(np.nan_to_num(va[col].to_numpy()), a)
-            rows.append({"horizon": f"{h}s", "rule": rule, "signal": col, "a": float(a),
+            out[(h, rule)] = max(((c, float(g)) for c in cols for g in grid),
+                                 key=lambda cg: macro_f1(ytr, by_threshold(x[cg[0]], cg[1])))
+    return out
+
+
+def predict(sig: pd.DataFrame, col: str, a: float) -> np.ndarray:
+    return by_threshold(np.nan_to_num(sig[col].to_numpy()), a)
+
+
+def run(pool: str) -> pd.DataFrame:
+    chosen, valid = fit(pool), signals(pool, *VALID)
+    rows = []
+    for h in HORIZONS:
+        va = valid.dropna(subset=[f"label_{h}s"])
+        yva = va[f"label_{h}s"].to_numpy(int)
+        rows.append({"horizon": f"{h}s", "rule": "flat", "signal": "", "a": None,
+                     "macro_f1": macro_f1(yva, np.zeros_like(yva)), "accuracy": (yva == 0).mean()})
+        for rule in GRIDS:
+            col, a = chosen[(h, rule)]
+            p = predict(va, col, a)
+            rows.append({"horizon": f"{h}s", "rule": rule, "signal": col, "a": a,
                          "macro_f1": macro_f1(yva, p), "accuracy": (yva == p).mean()})
     out = pd.DataFrame(rows)
     print(f"\n[baselines] {pool}: thresholds fit on {TRAIN[0]}..{TRAIN[1]}, scored on {VALID[0]}..{VALID[1]}")

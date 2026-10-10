@@ -130,5 +130,13 @@ def train(kind: str = typer.Argument("logreg", help="model kind: logreg or lgbm"
     t.run(kind, pools=tuple(pools.split(",")), horizons=tuple(horizons.split(",")))
 
 
+@app.command()
+def evaluate(pools: str = "SUI_USDC,DEEP_USDC"):
+    """Bootstrap intervals, paired comparisons, confident-call economics and lead-lag on Sep 2025."""
+    from flowcast import evaluate as e
+
+    e.run(tuple(pools.split(",")))
+
+
 if __name__ == "__main__":
     app()
