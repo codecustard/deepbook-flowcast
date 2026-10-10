@@ -17,7 +17,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ml = ["scikit-learn>=1.5", "lightgbm>=4.3", "torch>=2.3", "shap>=0.45"]
+ml = ["scikit-learn>=1.5", "lightgbm>=4.3"]  # SHAP values: lightgbm predict(pred_contrib=True)
+dl = ["torch>=2.3"]
 serve = ["fastapi>=0.111", "uvicorn[standard]>=0.30", "streamlit>=1.36"]
 dev = ["pytest>=8", "ruff>=0.5", "ipykernel", "matplotlib"]
 

@@ -1,7 +1,7 @@
 .PHONY: setup collect-2025 collect-2026 status snapshots test lint
 
 setup:
-	uv sync --extra dev
+	uv sync --extra dev --extra ml
 	cp -n .env.example .env || true
 
 collect-2025:

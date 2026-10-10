@@ -10,18 +10,12 @@
   thin pool     DEEP_USDC is test-only: SUI_USDC-trained models scored as-is, then retrained once
 """
 
-import numpy as np
+from sklearn.metrics import f1_score
 
 
-def macro_f1(y: np.ndarray, p: np.ndarray, classes=(-1, 0, 1)) -> float:
+def macro_f1(y, p, classes=(-1, 0, 1)) -> float:
     """Mean F1 over the classes, so always predicting the biggest class scores poorly."""
-    f1s = []
-    for c in classes:
-        tp = np.sum((p == c) & (y == c))
-        prec = tp / max(np.sum(p == c), 1)
-        rec = tp / max(np.sum(y == c), 1)
-        f1s.append(2 * prec * rec / (prec + rec) if prec + rec else 0.0)
-    return float(np.mean(f1s))
+    return float(f1_score(y, p, average="macro", labels=list(classes), zero_division=0))
 
 
 def run() -> None:

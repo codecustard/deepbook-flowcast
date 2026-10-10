@@ -1,7 +1,18 @@
+import os
+import sys
+
 import typer
 
 app = typer.Typer(help="deepbook-flowcast: when does ML beat the imbalance rule on DeepBook?",
                   no_args_is_help=True)
+
+
+@app.callback()
+def _line_buffered() -> None:
+    """Print progress line by line even when piped (e.g. into `tee`), including from
+    parallel worker processes (they inherit PYTHONUNBUFFERED)."""
+    sys.stdout.reconfigure(line_buffering=True)
+    os.environ.setdefault("PYTHONUNBUFFERED", "1")
 
 
 # ------------------------------------------------------------ collector (raw data only)
@@ -108,6 +119,15 @@ def features(pools: str = "SUI_USDC,DEEP_USDC",
 
     for p in pools.split(","):
         f.build(p, redo=redo)
+
+
+@app.command()
+def train(kind: str = typer.Argument("logreg", help="model kind: logreg"),
+          pools: str = "SUI_USDC,DEEP_USDC", horizons: str = "1s,10s,60s"):
+    """Train on Aug 2025 (tuned with TimeSeriesSplit), score on Sep 2025 next to the best rule."""
+    from flowcast.models import train as t
+
+    t.run(kind, pools=tuple(pools.split(",")), horizons=tuple(horizons.split(",")))
 
 
 if __name__ == "__main__":
