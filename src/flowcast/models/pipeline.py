@@ -77,6 +77,20 @@ def importances(pipe: Pipeline) -> pd.Series:
     return pd.Series(b.feature_importance("gain"), index=b.feature_name()).sort_values(ascending=False)
 
 
+def shap_values(pipe: Pipeline, X: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """LightGBM SHAP values per class: {"down"|"flat"|"up": rows of X x (features + "bias")}.
+
+    Each row adds up to the model's raw score (log-odds) for that class: bias + sum of the
+    feature contributions. Positive = that feature pushed this prediction toward the class.
+    """
+    m = pipe.named_steps["model"]
+    raw = m.predict(X, pred_contrib=True)
+    k, cols = X.shape[1] + 1, [*X.columns, "bias"]
+    names = {-1: "down", 0: "flat", 1: "up"}
+    return {names[c]: pd.DataFrame(raw[:, i * k:(i + 1) * k], columns=cols, index=X.index)
+            for i, c in enumerate(m.classes_)}
+
+
 def coefficients(pipe: Pipeline) -> pd.DataFrame:
     """Logistic regression weights: one row per (preprocessed) feature, one column per class."""
     m = pipe.named_steps["model"]

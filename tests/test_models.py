@@ -34,3 +34,17 @@ def test_lgbm_learns_a_planted_signal_with_missing_values():
     X.loc[::50, "noise"] = np.nan
     m = make_pipeline("lgbm", list(X.columns), n_estimators=50).fit(X, y)
     assert macro_f1(y, m.predict(X)) > 0.9
+
+
+def test_lgbm_shap_values_add_up_to_raw_scores():
+    from flowcast.models.pipeline import shap_values
+
+    r = np.random.default_rng(3)
+    x = r.normal(size=2000)
+    X = pd.DataFrame({"signal": x, "noise": r.normal(size=2000)})
+    y = np.select([x > 0.5, x < -0.5], [1, -1], 0)
+    m = make_pipeline("lgbm", list(X.columns), n_estimators=30).fit(X, y)
+    sv, raw = shap_values(m, X), m.named_steps["model"].predict(X, raw_score=True)
+    for i, c in enumerate(["down", "flat", "up"]):
+        assert np.allclose(sv[c].sum(axis=1), raw[:, i])
+    assert sv["up"]["signal"].abs().mean() > sv["up"]["noise"].abs().mean()  # the real signal dominates
