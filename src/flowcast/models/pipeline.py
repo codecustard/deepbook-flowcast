@@ -6,12 +6,16 @@ only (per notebooks/01_eda.ipynb):
   3. clip at the training 1st / 99th percentiles
   4. standardize (mean 0, std 1)
   5. model
+
+Tree models (lgbm) skip 1-4: splits only compare values, so scale and tails don't matter,
+and LightGBM routes missing values itself.
 """
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from lightgbm import LGBMClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -58,9 +62,19 @@ def preprocess(columns: list[str]) -> Pipeline:
 def make_pipeline(kind: str, columns: list[str], **params) -> Pipeline:
     if kind == "logreg":
         model = LogisticRegression(class_weight="balanced", max_iter=1000, **params)
-    else:
-        raise ValueError(f"unknown model kind {kind!r}")
-    return Pipeline([("pre", preprocess(columns)), ("model", model)])
+        return Pipeline([("pre", preprocess(columns)), ("model", model)])
+    if kind == "lgbm":
+        # n_jobs=1: the hyperparameter search already runs one fit per core
+        model = LGBMClassifier(learning_rate=0.05, min_child_samples=200, subsample=0.8, subsample_freq=1,
+                               colsample_bytree=0.8, n_jobs=1, verbose=-1, **params)
+        return Pipeline([("model", model)])
+    raise ValueError(f"unknown model kind {kind!r}")
+
+
+def importances(pipe: Pipeline) -> pd.Series:
+    """LightGBM feature importance: total loss reduction (gain) from splits on each feature."""
+    b = pipe.named_steps["model"].booster_
+    return pd.Series(b.feature_importance("gain"), index=b.feature_name()).sort_values(ascending=False)
 
 
 def coefficients(pipe: Pipeline) -> pd.DataFrame:

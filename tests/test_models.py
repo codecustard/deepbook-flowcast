@@ -24,3 +24,13 @@ def test_logreg_learns_a_planted_signal_with_missing_values():
     X.loc[::50, "noise"] = np.nan
     m = make_pipeline("logreg", list(X.columns)).fit(X, y)
     assert macro_f1(y, m.predict(X)) > 0.9
+
+
+def test_lgbm_learns_a_planted_signal_with_missing_values():
+    r = np.random.default_rng(2)
+    x = r.normal(size=3000)
+    y = np.select([x > 0.5, x < -0.5], [1, -1], 0)
+    X = pd.DataFrame({"signal": x, "noise": r.normal(size=3000)})
+    X.loc[::50, "noise"] = np.nan
+    m = make_pipeline("lgbm", list(X.columns), n_estimators=50).fit(X, y)
+    assert macro_f1(y, m.predict(X)) > 0.9

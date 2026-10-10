@@ -30,7 +30,11 @@ from flowcast.models import rules
 from flowcast.models.data import FEATURE_SETS, TRAIN, VALID, default_step, load_table, xy
 from flowcast.models.pipeline import make_pipeline
 
-GRIDS = {"logreg": {"model__C": [1e-4, 1e-3, 1e-2, 1e-1], "model__class_weight": ["balanced", None]}}
+GRIDS = {
+    "logreg": {"model__C": [1e-4, 1e-3, 1e-2, 1e-1], "model__class_weight": ["balanced", None]},
+    "lgbm": {"model__n_estimators": [150, 400], "model__num_leaves": [15, 63],
+             "model__class_weight": ["balanced", None]},
+}
 HORIZONS = ("1s", "10s", "60s")
 SCORER = make_scorer(macro_f1)
 CV_FOLDS = 3

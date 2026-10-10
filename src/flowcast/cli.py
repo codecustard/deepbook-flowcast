@@ -122,7 +122,7 @@ def features(pools: str = "SUI_USDC,DEEP_USDC",
 
 
 @app.command()
-def train(kind: str = typer.Argument("logreg", help="model kind: logreg"),
+def train(kind: str = typer.Argument("logreg", help="model kind: logreg or lgbm"),
           pools: str = "SUI_USDC,DEEP_USDC", horizons: str = "1s,10s,60s"):
     """Train on Aug 2025 (tuned with TimeSeriesSplit), score on Sep 2025 next to the best rule."""
     from flowcast.models import train as t
