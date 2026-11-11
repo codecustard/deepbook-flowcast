@@ -111,3 +111,18 @@ Newest at the bottom. Commands run from the repo root. Notebooks show the result
   and doesn't degrade). Check: predicted class mix per week.
 - **Week 3** (market maker absent until Sep 15 09:00): no dip anywhere.
 - **Next:** October test, once. Choose which model per pool/horizon from this run before looking.
+
+## 2026-11-10 — October 2025 held-out test (once)
+- **Chosen before looking** (from walk-forward): primary = Aug–Sep retrained for SUI 1s, Aug-only elsewhere;
+  alternative reported alongside; rules refit on Aug 2 – Sep 30.
+- **Ran:** `flowcast holdout oct2025` (`2d55e76`, clean, not forced) → `runs/20261110-191559_final/` (models + rule
+  thresholds, ~17 min) and `runs/20261110-193241_holdout_oct2025/`; log `holdout_oct2025.log`.
+- **Result:** all 12 primary-vs-rule comparisons real. Lift: SUI 1s +0.153 (0.520 vs 0.367), 10s +0.107, 60s +0.044;
+  DEEP 1s +0.067, 10s +0.082, 60s +0.057.
+- **Choice check:** retraining SUI 1s was right (+0.052). Elsewhere the retrained alternative was slightly better
+  (−0.003 to −0.010 for primary; SUI 10s not proven): September's "retraining hurts" did not carry into October.
+  Retrain-everywhere would have scored ~0.005 higher. Lesson: retrain by default.
+- **Economics:** still no profitable taker call at any confidence (top 1% SUI 1s: 86% directional, net −56 bps).
+  Average cost ~10 bps vs ~3.4 in Sep, with very wide intervals: likely the Oct 10 2025 crash widening spreads
+  (to confirm per day).
+- **Next:** frozen models on Jul–Sep 2026 (`flowcast holdout 2026 --final-run 20261110-191559_final`).
