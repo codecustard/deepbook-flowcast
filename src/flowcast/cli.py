@@ -146,5 +146,23 @@ def walkforward(pools: str = "SUI_USDC,DEEP_USDC", horizons: str = "1s,10s,60s")
     wf.run(tuple(pools.split(",")), tuple(horizons.split(",")))
 
 
+@app.command(name="final-train")
+def final_train(pools: str = "SUI_USDC,DEEP_USDC"):
+    """Retrain LightGBM on Aug 2 - Sep 30 (frozen settings) and refit the rules, for the held-out tests."""
+    from flowcast.models import holdout as ho
+
+    ho.train_final(tuple(pools.split(",")))
+
+
+@app.command()
+def holdout(period: str = typer.Argument(..., help="oct2025 or 2026"),
+            final_run: str = typer.Option(None, help="runs/ folder from final-train; trained now if omitted"),
+            force: bool = typer.Option(False, help="re-run a period already tested (record why in LOG.md)")):
+    """One-time held-out test: primary model vs alternative vs best rule, with bootstrap intervals."""
+    from flowcast.models import holdout as ho
+
+    ho.run(period, final_run=final_run, force=force)
+
+
 if __name__ == "__main__":
     app()
