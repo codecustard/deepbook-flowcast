@@ -138,5 +138,13 @@ def evaluate(pools: str = "SUI_USDC,DEEP_USDC"):
     e.run(tuple(pools.split(",")))
 
 
+@app.command()
+def walkforward(pools: str = "SUI_USDC,DEEP_USDC", horizons: str = "1s,10s,60s"):
+    """Walk-forward over September 2025 weeks: retrained LightGBM vs fixed Aug model vs best rule."""
+    from flowcast.models import walkforward as wf
+
+    wf.run(tuple(pools.split(",")), tuple(horizons.split(",")))
+
+
 if __name__ == "__main__":
     app()
