@@ -96,3 +96,18 @@ Newest at the bottom. Commands run from the repo root. Notebooks show the result
   `03_models`; run results (`config.json`, `results.csv`, evaluation tables) now tracked in git (models stay local:
   `runs/*/models/` is ignored); every training run now also saves `cv_results.csv` (every setting × fold score).
 - **Next:** walk-forward evaluation, then the October test (once).
+
+## 2026-11-10 — Walk-forward over September weeks
+- **Ran:** `flowcast walkforward` (`d940b95`, clean) → `runs/20261110-173006_walkforward/` (~90 min, log
+  `walkforward.log`). 4 Sep weeks, expanding train from Aug 2, purge = horizon; LightGBM retrained per week with the
+  Aug-tuned settings vs the fixed Aug model vs the best rule (refit per week, chosen on train).
+- **Sanity check:** week 1 retrained = fixed (same data, same settings), as expected.
+- **Result:** model beats the rule in 23 of 24 weeks; all 12 pooled model-vs-rule comparisons real. Pooled lift:
+  SUI 1s +0.166 (retrained) / +0.118 (fixed); SUI 10s +0.070 / +0.088; SUI 60s +0.025 / +0.038; DEEP +0.07–0.09 either.
+  Only loss: SUI 60s week 2 (−0.009). The single-split +0.105 at SUI 10s was optimistic; walk-forward says +0.07–0.09.
+- **Surprise:** retraining helps SUI 1s (+0.048 vs fixed) but reliably hurts SUI 10s/60s (−0.018 / −0.014); no effect
+  on DEEP. At SUI 10s the refit rule switches from lead-lag to imbalance and improves (0.33 → 0.39) as Sep enters the
+  training window: SUI changed during September. Not explained yet (class-weight guess undercut: DEEP has none either
+  and doesn't degrade). Check: predicted class mix per week.
+- **Week 3** (market maker absent until Sep 15 09:00): no dip anywhere.
+- **Next:** October test, once. Choose which model per pool/horizon from this run before looking.

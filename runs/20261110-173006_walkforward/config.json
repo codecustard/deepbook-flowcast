@@ -1,0 +1,33 @@
+{
+  "folds": [
+    [
+      "2025-09-01",
+      "2025-09-08"
+    ],
+    [
+      "2025-09-08",
+      "2025-09-15"
+    ],
+    [
+      "2025-09-15",
+      "2025-09-22"
+    ],
+    [
+      "2025-09-22",
+      "2025-10-01"
+    ]
+  ],
+  "train_start": "2025-08-02",
+  "horizons": [
+    "1s",
+    "10s",
+    "60s"
+  ],
+  "features": "all",
+  "params_from": "20261009-191600_lgbm",
+  "purge": "label end <= test start",
+  "git": {
+    "commit": "d940b959bc5da57eca2324b2a6af2c55a9016ae0",
+    "uncommitted_changes": false
+  }
+}
