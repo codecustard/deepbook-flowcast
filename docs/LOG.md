@@ -126,3 +126,28 @@ Newest at the bottom. Commands run from the repo root. Notebooks show the result
   Average cost ~10 bps vs ~3.4 in Sep, with very wide intervals: likely the Oct 10 2025 crash widening spreads
   (to confirm per day).
 - **Next:** frozen models on Jul–Sep 2026 (`flowcast holdout 2026 --final-run 20261110-191559_final`).
+
+## 2026-11-10 → 11-11 — Jul–Sep 2026 held-out test (regime shift)
+- **Ran:** `flowcast holdout 2026 --final-run 20261110-191559_final`, same frozen models and rule thresholds as October.
+- **First attempt broke:** the Mac ran out of disk mid-DEEP (memory swap on ~8M rows per pool) →
+  `runs/20261110-194659_holdout_2026_BROKEN_disk_full/` (incomplete; kept as a record). Freed space; re-ran with
+  `--force` (`12c108f`, clean) → `runs/20261111-184908_holdout_2026/`, log `holdout_2026.log`. Partial numbers from the
+  broken run matched the re-run exactly (deterministic).
+- **SUI holds up:** primary beats the rule at every horizon: 1s +0.059, 10s +0.132, 60s +0.087 (the rule is weaker in
+  the thin 2026 market).
+- **SUI 1s: the Aug-only model collapses** (0.298, below the rule at 0.351 and near always-flat at 0.259); the Aug–Sep
+  retrained model holds (0.410, +0.112 over Aug-only). The walk-forward pick mattered here. Why the Aug-only 1s model
+  breaks is not checked yet.
+- **DEEP is mixed:** 1s +0.358 (0.644 vs rule 0.286, which falls BELOW always-flat at 0.303: the imbalance rule fires on
+  a stale book in a market that often has no events for 30+ s; the model mostly learns "dead market → flat". Do not
+  headline this number). 10s +0.055. **60s: first held-out loss**, −0.014 [−0.026, −0.002].
+- **Economics:** still no profitable taker call anywhere. SUI average cost ~5.9 bps vs moves under 3 bps; DEEP cost
+  ~37 bps.
+- **Next:** README results section + charts; write-up.
+
+## 2026-11-11 — Write-up: README results + figures; fee check
+- **Added:** README Results section (only claims backed by run CSVs), `docs/make_figures.py` → `docs/img/`
+  (`lift_by_period`, `cost_vs_move`, `leadlag`), ROADMAP wrap-up line.
+- **Fee check** (raw trades, `taker_fee` field converted at the day's average DEEP_USDC price): SUI_USDC taker fee
+  median ~1.0 bp on 2025-09-15, ~2.0 bp on 2026-08-15; maker fee 0 on both. The analysis uses 1 bp per side, right for
+  2025, so **2026 costs are understated by ~1 bp per side** — the "not profitable as a taker" conclusion only strengthens.
