@@ -99,6 +99,20 @@ Public [DeepBookV3 indexer](https://docs.sui.io/standards/deepbookv3-indexer) by
 
 Binance reference trades come from [Binance public data](https://data.binance.vision) (free, no key): SUIUSDC and SUIUSDT spot, DEEPUSDT USD-M perp.
 
+### Size (not in this repo: `data/` is gitignored; rebuild with the Quickstart commands)
+
+Aug–Oct 2025 and Jul–Sep 2026, 184 days, both pools, every hour (0 truncated hours, 0 duplicates):
+
+| | Rows | On disk |
+|---|---|---|
+| DeepBook order events (placed / modified / cancelled / expired) | 309M (SUI 286M, DEEP 23M) | 3.9 GB |
+| DeepBook trades (fills) | 5.9M | 1.1 GB |
+| Binance trades (SUIUSDC, SUIUSDT spot; DEEPUSDT perp) | 57.5M | 1.4 GB |
+| Rebuilt order book, one row per second per pool | 31.8M | 1.4 GB |
+| Features (37 per second) + labels | 31.8M | 3.9 GB |
+
+~12 GB in total, Parquet.
+
 ## License
 
 MIT
